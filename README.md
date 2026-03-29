@@ -1,47 +1,18 @@
-# Sportradar Coding Academy - Backend Exercise
-
-## Overview
-This project is a sports event calendar web application built for the Sportradar Coding Academy Backend Exercise. It allows users to view scheduled and played sports events, add new events, and delete existing ones. The application features a normalized relational database (3NF) and a custom PHP RESTful API to handle data manipulation efficiently.
+# Sportradar Backend Exercise - Sports Calendar
 
 **Live Demo:** [http://sportradarbeproject.page.gd/](http://sportradarbeproject.page.gd/)
 
-## Features & Technical Highlights
-* **Efficient Data Retrieval:** The `get_events.php` endpoint fetches and displays events dynamically from the database using a single, efficient `LEFT JOIN` SQL query. This strictly adheres to the requirement of avoiding SQL queries inside loops.
-* **Add Events:** A user-friendly frontend form (`index.html`) that communicates with `add_event.php` via the Fetch API to insert new matches into the database.
-* **Delete Events (Bonus):** Implemented an additional feature (`delete_event.php`) allowing users to dynamically remove events from the calendar.
-* **Database Design:** The database strictly follows the Third Normal Form (3NF) with a clear separation of entities (events, sports, teams, venues). All foreign keys are properly named with an underscore prefix (e.g., `_home_team_id`, `_sport_id`) as requested.
+## Overview
+A lightweight sports event calendar built with **PHP, MySQL, and Vanilla JavaScript**. It allows users to view, add, and delete sports events. The project features a fully normalized (3NF) database and a custom RESTful API, specifically designed to retrieve related data efficiently using a single `JOIN` query (avoiding N+1 query problems).
 
-## Tech Stack
-* **Backend:** PHP (PDO for secure database interactions)
-* **Database:** MySQL
-* **Frontend:** HTML5, CSS3, Vanilla JavaScript (Fetch API)
+## Setup Instructions
+1. **Clone the repo:** `git clone https://github.com/vsld9mch/RadarSportBE_Project.git`
+2. **Database Setup:** Create a new database in MySQL and import the `database.sql` file to set up tables and seed data.
+3. **Configuration:** Open `db.php` and update the `$host`, `$db`, `$user`, and `$pass` variables with your local database credentials.
+4. **Run:** Place the project folder in your local web server root (e.g., `htdocs` for XAMPP) and open `index.html` in your browser.
 
-## Repository Structure
-All core files are located in the root directory for simplicity and ease of review:
-* `index.html` - The frontend user interface.
-* `db.php` - Database connection configuration.
-* `get_events.php`, `add_event.php`, `delete_event.php` - API endpoints handling CRUD operations.
-* `database.sql` - Database export file containing the schema and initial seed data (AFC Champions League matches).
-
-## Setup and Installation Instructions
-To run this project locally on your machine, follow these steps:
-
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/vsld9mch/RadarSportBE_Project.git](https://github.com/vsld9mch/RadarSportBE_Project.git)
-    ```
-2.  **Database Setup:**
-    * Start your local server environment (e.g., XAMPP, MAMP, or WAMP).
-    * Open phpMyAdmin and create a new database named `sports_calendar`.
-    * Import the provided `database.sql` file into this new database to create the tables and populate the initial data.
-3.  **Configure Environment:**
-    * Open the `db.php` file in your code editor.
-    * Update the database connection credentials (`$host`, `$db`, `$user`, `$pass`) to match your local MySQL server settings (usually `localhost` and `root`).
-4.  **Run the Application:**
-    * Place the cloned project folder inside your web server's root directory (e.g., the `htdocs` folder for XAMPP).
-    * Navigate to `http://localhost/YOUR_PROJECT_FOLDER/index.html` in your web browser.
-
-## Assumptions and Decisions
-* **Technology Choice:** PHP and MySQL were chosen for their reliability and straightforward deployment on standard web hosting environments. PDO was used to prevent SQL injection vulnerabilities.
-* **Frontend Architecture:** Opted for a Single Page Application (SPA) approach using Vanilla JavaScript and the Fetch API. This cleanly separates the frontend presentation layer from the backend API logic.
-* **API Structure:** Placed API endpoints in the root directory alongside the frontend to simplify the project structure for the reviewers, similar to my previous portfolio projects.
+## Key Decisions & Architecture
+* **Single Directory Structure:** Frontend (`index.html`), API endpoints (`.php`), and config (`db.php`) are kept in the root folder for simplicity and easy review.
+* **Efficient Data Retrieval:** `get_events.php` uses a `LEFT JOIN` to fetch events, teams, sports, and venues in one single request, strictly avoiding SQL queries inside loops.
+* **Bonus Feature:** Implemented a "Delete" function using the Fetch API and a dedicated `DELETE` endpoint to demonstrate full CRUD understanding.
+* **Security:** Used PHP PDO with prepared statements across all endpoints to prevent SQL injection.
