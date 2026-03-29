@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Event Calendar</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+        
+        header { background-color: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: bold; opacity: 0.8; }
+        nav a:hover { opacity: 1; }
+
+        .container { max-width: 900px; margin: 30px auto; padding: 20px; }
+        
+        .add-form-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .form-row input, .form-row select { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #e63946; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+        button:hover { background-color: #d62828; }
+
+        .event-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px; border-left: 5px solid #003366; }
+        .event-header { display: flex; justify-content: space-between; font-size: 0.9em; color: #555; margin-bottom: 15px; align-items: center; }
+        .event-teams { display: flex; justify-content: center; align-items: center; font-size: 1.2em; font-weight: bold; gap: 15px;}
+        .score { background: #e63946; color: white; padding: 5px 15px; border-radius: 20px; font-size: 1.1em; }
+        .stage { text-align: center; color: #888; font-size: 0.85em; margin-top: 10px; }
+        
+        .delete-btn { background: none; color: #e63946; border: none; padding: 0; width: auto; font-size: 1.2em; cursor: pointer; transition: transform 0.2s; }
+        .delete-btn:hover { transform: scale(1.2); background: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>Sportradar Calendar</h2>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">AFC Champions League</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        
+        <div class="add-form-container">
+            <h3>Add New Event</h3>
+            <form id="addEventForm">
+                <div class="form-row">
+                    <input type="date" id="date_venue" required>
+                    <input type="time" id="time_venue_utc" required>
+                    <select id="status">
+                        <option value="scheduled">Scheduled</option>
+                        <option value="played">Played</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input type="number" id="_home_team_id" placeholder="Home Team ID (e.g., 1)" required>
+                    <input type="number" id="_away_team_id" placeholder="Away Team ID (e.g., 2)" required>
+                </div>
+                <input type="hidden" id="_sport_id" value="1"> 
+                <button type="submit">Add Event</button>
+            </form>
+        </div>
+
+        <div id="events-list">
+            <p>Loading events...</p>
+        </div>
+
+    </div>
+
+    <script>
+        async function fetchEvents() {
+            try {
+                const response = await fetch('/api/get_events.php');
+                const events = await response.json();
+                
+                const container = document.getElementById('events-list');
+                container.innerHTML = ''; 
+
+                if (events.length === 0) {
+                    container.innerHTML = '<p>No scheduled events.</p>';
+                    return;
+                }
+
+                events.forEach(event => {
+                    const scoreDisplay = event.status === 'played' 
+                        ? `${event.home_goals} : ${event.away_goals}` 
+                        : 'vs';
+
+                    const card = `
+                        <div class="event-card">
+                            <div class="event-header">
+                                <span>📅 ${event.date_venue} | ⏰ ${event.time_venue_utc}</span>
+                                <span>🏅 ${event.sport_name}</span>
+                                <span>🏟️ ${event.venue_name || 'Unknown'}</span>
+                                <button class="delete-btn" onclick="deleteEvent(${event.id})" title="Delete Event">🗑️</button>
+                            </div>
+                            <div class="event-teams">
+                                <span>${event.home_team}</span>
+                                <span class="score">${scoreDisplay}</span>
+                                <span>${event.away_team}</span>
+                            </div>
+                            <div class="stage">${event.stage_name || 'Regular Season'} - ${event.status}</div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+            } catch (error) {
+                console.error('Loading error:', error);
+                document.getElementById('events-list').innerHTML = '<p style="color:red;">Error loading data from the server.</p>';
+            }
+        }
+
+        async function deleteEvent(id) {
+            if (confirm('Are you sure you want to delete this event?')) {
+                try {
+                    const response = await fetch(`/api/delete_event.php?id=${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        fetchEvents(); 
+                    } else {
+                        const err = await response.json();
+                        alert('Error: ' + err.error);
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                }
+            }
+        }
+
+        document.getElementById('addEventForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const newEvent = {
+                date_venue: document.getElementById('date_venue').value,
+                time_venue_utc: document.getElementById('time_venue_utc').value,
+                status: document.getElementById('status').value,
+                _home_team_id: parseInt(document.getElementById('_home_team_id').value),
+                _away_team_id: parseInt(document.getElementById('_away_team_id').value),
+                _sport_id: parseInt(document.getElementById('_sport_id').value),
+                season: 2024,
+                stage_name: "New Stage",
+                home_goals: 0,
+                away_goals: 0
+            };
+
+            try {
+                const response = await fetch('/api/add_event.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newEvent)
+                });
+
+                if (response.ok) {
+                    alert('Event added successfully!');
+                    this.reset(); 
+                    fetchEvents(); 
+                } else {
+                    const err = await response.json();
+                    alert('Error: ' + err.error);
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+            }
+        });
+
+        window.onload = fetchEvents;
+    </script>
+</body>
+</html>
