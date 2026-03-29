@@ -5,6 +5,11 @@
 ## Overview
 A lightweight sports event calendar built with **PHP, MySQL, and Vanilla JavaScript**. It allows users to view, add, and delete sports events. The project features a fully normalized (3NF) database and a custom RESTful API, specifically designed to retrieve related data efficiently using a single `JOIN` query (avoiding N+1 query problems).
 
+## Tech Stack
+* **Backend:** PHP (PDO for secure database interactions)
+* **Database:** MySQL
+* **Frontend:** HTML5, CSS3, Vanilla JavaScript (Fetch API)
+
 ## Setup Instructions
 1. **Clone the repo:** `git clone https://github.com/vsld9mch/RadarSportBE_Project.git`
 2. **Database Setup:** Create a new database in MySQL and import the `database.sql` file to set up tables and seed data.
