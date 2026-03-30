@@ -1,0 +1,1 @@
+During this project, I used AI(Gemini) as a learning assistant and sparring partner. I used it to validate my database normalization(3NF) approach, get advice on structuring my README documentation, and clarify best practices for RESTful API HTTP status codes. All the core logic and SQL queries were written and thoroughly reviewed by me to ensure full understanding.
